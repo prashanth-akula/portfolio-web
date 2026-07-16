@@ -11,7 +11,6 @@ import {
   MapPin,
   Globe,
   MessageCircle,
-  Send,
   Award,
   GraduationCap,
   X as CloseIcon,
@@ -1278,19 +1277,7 @@ export default function Portfolio() {
         }
         .pa-social-btn:hover { border-color: rgba(248,250,252,0.5); color: var(--silver-100); transform: translateY(-3px); }
 
-        .pa-form { padding: 40px; }
-        .pa-form-row { margin-bottom: 22px; }
-        .pa-form-row label {
-          display: block; font-family: var(--font-body); font-weight: 500; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--silver-500); margin-bottom: 10px;
-        }
-        .pa-form-row input, .pa-form-row textarea {
-          width: 100%; background: rgba(255,255,255,0.02); border: 1px solid var(--hairline-strong); border-radius: 12px;
-          padding: 14px 16px; font-family: var(--font-body); font-size: 14.5px; color: var(--silver-100); outline: none;
-          transition: border-color 0.3s ease, background 0.3s ease;
-        }
-        .pa-form-row input:focus, .pa-form-row textarea:focus { border-color: rgba(248,250,252,0.45); background: rgba(255,255,255,0.04); }
-        .pa-form-row textarea { resize: vertical; min-height: 110px; font-family: var(--font-body); }
-        .pa-form-row input::placeholder, .pa-form-row textarea::placeholder { color: var(--silver-700); }
+
 
         /* ============ ABOUT & CONTACT COMBINED GRID ============ */
         .pa-about-contact-grid {
@@ -1706,7 +1693,7 @@ export default function Portfolio() {
 
             <div className="pa-contact-col-content">
               <Reveal>
-                <div className="pa-contact-info-list" style={{ marginBottom: '34px' }}>
+                <div className="pa-contact-info-list">
                   <div className="pa-contact-row">
                     <MapPin size={17} />
                     <span>Hyderabad, Telangana, India</span>
@@ -1728,27 +1715,6 @@ export default function Portfolio() {
                     <a href="https://www.linkedin.com/in/prashanth-akula-166841413?utm_source=share_via&utm_content=profile&utm_medium=member_ios" target="_blank" rel="noopener noreferrer" className="pa-social-btn" aria-label="LinkedIn"><Linkedin size={17} /></a>
                     <a href="https://wa.me/919494035343" target="_blank" rel="noopener noreferrer" className="pa-social-btn" aria-label="WhatsApp"><MessageCircle size={17} /></a>
                   </div>
-                </div>
-              </Reveal>
-
-              <Reveal delay={100}>
-                <div className="pa-card pa-form">
-                  <div className="pa-form-row">
-                    <label>Name</label>
-                    <input type="text" placeholder="Your name" />
-                  </div>
-                  <div className="pa-form-row">
-                    <label>Email</label>
-                    <input type="email" placeholder="you@example.com" />
-                  </div>
-                  <div className="pa-form-row">
-                    <label>Message</label>
-                    <textarea placeholder="Tell me about your project..." />
-                  </div>
-                  <button type="button" className="pa-btn pa-btn-primary pa-btn-sm" onMouseMove={handleMagnetMove} onMouseLeave={handleMagnetLeave}>
-                    <span className="pa-btn-label pa-metallic-static">Send Message</span>
-                    <Send size={14} color="#f5f6f8" />
-                  </button>
                 </div>
               </Reveal>
             </div>
