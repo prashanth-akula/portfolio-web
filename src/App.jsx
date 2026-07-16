@@ -321,281 +321,38 @@ function useVideoPreview(src) {
   return state;
 }
 
-function ThreeDParticleSphere() {
-  const canvasRef = useRef(null);
-  const mouseRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let animationFrameId;
-
-    const resize = () => {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-    };
-    resize();
-    window.addEventListener("resize", resize);
-
-    const onMouseMove = (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      mouseRef.current.tx = (e.clientX - cx) / (rect.width / 2);
-      mouseRef.current.ty = (e.clientY - cy) / (rect.height / 2);
-    };
-    window.addEventListener("mousemove", onMouseMove);
-
-    const numParticles = 140;
-    const particles = [];
-
-    for (let i = 0; i < numParticles; i++) {
-      const k = i + 0.5;
-      const phi = Math.acos(1 - (2 * k) / numParticles);
-      const theta = Math.PI * (1 + Math.sqrt(5)) * k;
-
-      particles.push({
-        x: Math.sin(phi) * Math.cos(theta),
-        y: Math.sin(phi) * Math.sin(theta),
-        z: Math.cos(phi),
-        color: i % 2 === 0 ? "rgba(199, 208, 221, opacity)" : "rgba(59, 130, 246, opacity)"
-      });
-    }
-
-    let angleX = 0.002;
-    let angleY = 0.002;
-    let currentAngleX = 0;
-    let currentAngleY = 0;
-
-    const render = (time) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-
-      const mouse = mouseRef.current;
-      mouse.x += (mouse.tx - mouse.x) * 0.08;
-      mouse.y += (mouse.ty - mouse.y) * 0.08;
-
-      currentAngleX = angleX + mouse.y * 0.015;
-      currentAngleY = angleY + mouse.x * 0.015;
-
-      const cosX = Math.cos(currentAngleX);
-      const sinX = Math.sin(currentAngleX);
-      const cosY = Math.cos(currentAngleY);
-      const sinY = Math.sin(currentAngleY);
-
-      const projected = [];
-      const radius = Math.min(canvas.width, canvas.height) * 0.25 || 160;
-
-      for (let i = 0; i < numParticles; i++) {
-        const p = particles[i];
-
-        let y1 = p.y * cosX - p.z * sinX;
-        let z1 = p.z * cosX + p.y * sinX;
-
-        let x2 = p.x * cosY - z1 * sinY;
-        let z2 = z1 * cosY + p.x * sinY;
-
-        p.x = x2;
-        p.y = y1;
-        p.z = z2;
-
-        const morph = radius * (1 + 0.12 * Math.sin(time * 0.0012 + i * 0.2));
-        const mx = p.x * morph;
-        const my = p.y * morph;
-        const mz = p.z * morph;
-
-        const fov = 400;
-        const distance = 300;
-        const scale = fov / (fov + mz + distance);
-        const projX = cx + mx * scale;
-        const projY = cy + my * scale;
-
-        projected.push({
-          x: projX,
-          y: projY,
-          z: mz,
-          scale: scale,
-          color: p.color
-        });
-      }
-
-      projected.sort((a, b) => b.z - a.z);
-
-      const maxDistance = 75;
-      ctx.lineWidth = 0.55;
-      for (let i = 0; i < projected.length; i++) {
-        const p1 = projected[i];
-        for (let j = i + 1; j < projected.length; j++) {
-          const p2 = projected[j];
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < maxDistance) {
-            const alpha = (1 - dist / maxDistance) * 0.18 * p1.scale * p2.scale;
-            ctx.strokeStyle = `rgba(199, 208, 221, ${alpha})`;
-            ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      for (let i = 0; i < projected.length; i++) {
-        const p = projected[i];
-        const size = Math.max(0.5, p.scale * 3.5);
-        const alpha = Math.max(0.05, (p.z + radius) / (2 * radius) * 0.85);
-
-        ctx.fillStyle = p.color.replace("opacity", alpha);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
-        ctx.fill();
-
-        if (p.z > radius * 0.4) {
-          ctx.shadowBlur = 10;
-          ctx.shadowColor = "rgba(59, 130, 246, 0.4)";
-          ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.6})`;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, size * 0.5, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        }
-      }
-
-      animationFrameId = requestAnimationFrame(render);
-    };
-
-    render(0);
-
-    return () => {
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", onMouseMove);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        zIndex: 2,
-        opacity: 0.85
-      }}
-    />
-  );
-}
-
-function SoftwareCard({ software, index }) {
-  const cardRef = useRef(null);
-
-  const handleMouseMove = (e) => {
-    const el = cardRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const xc = rect.width / 2;
-    const yc = rect.height / 2;
-    const rx = -(y - yc) / (yc / 8);
-    const ry = (x - xc) / (xc / 8);
-    el.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translate3d(0, -5px, 10px) scale3d(1.04, 1.04, 1.04)`;
-  };
-
-  const handleMouseLeave = () => {
-    const el = cardRef.current;
-    if (!el) return;
-    el.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0) scale3d(1, 1, 1)`;
-  };
-
-  return (
-    <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className="pa-soft-card"
-      style={{
-        animationDelay: `${index * 0.35}s`,
-        transformStyle: "preserve-3d",
-        transition: "transform 0.15s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.4s ease, box-shadow 0.4s ease",
-        height: "100%",
-        width: "100%"
-      }}
-    >
-      <div className="pa-soft-tile" style={{ background: software.bg, color: software.accent, transform: "translateZ(25px)" }}>{software.label}</div>
-      <span className="pa-soft-name" style={{ transform: "translateZ(12px)" }}>{software.name}</span>
-    </div>
-  );
-}
-
+/* ---- One Featured Work card. Same markup/classes/animations as before —
+   only difference is a real video wires up a captured thumbnail, a software
+   tag, and a click-to-play modal. ---- */
 function WorkCard({ project, index, delay, onOpen }) {
   const livePreview = useVideoPreview(project.thumb ? null : project.video);
   const thumb = project.thumb || livePreview.thumb;
   const duration = project.dur || livePreview.duration;
   const isPlayable = Boolean(project.video);
-  const cardRef = useRef(null);
-
-  const handleMouseMove = (e) => {
-    const el = cardRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const xc = rect.width / 2;
-    const yc = rect.height / 2;
-    const rx = -(y - yc) / (yc / 12);
-    const ry = (x - xc) / (xc / 12);
-    el.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translate3d(0, -6px, 12px) scale3d(1.02, 1.02, 1.02)`;
-  };
-
-  const handleMouseLeave = () => {
-    const el = cardRef.current;
-    if (!el) return;
-    el.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translate3d(0, 0, 0) scale3d(1, 1, 1)`;
-  };
 
   return (
-    <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        transformStyle: "preserve-3d",
-        transition: "transform 0.15s cubic-bezier(0.25, 1, 0.5, 1)"
-      }}
+    <Reveal
+      delay={delay}
+      direction="work"
+      className="pa-work-card pa-card"
+      as={isPlayable ? "button" : "div"}
+      style={isPlayable ? { textAlign: "left", width: "100%" } : undefined}
     >
-      <Reveal
-        delay={delay}
-        direction="work"
-        className="pa-work-card pa-card"
-        as={isPlayable ? "button" : "div"}
-        style={isPlayable ? { textAlign: "left", width: "100%", height: "100%" } : { height: "100%" }}
+      <div
+        className="pa-work-thumb"
+        onClick={isPlayable ? () => onOpen(project) : undefined}
       >
-        <div
-          className="pa-work-thumb"
-          onClick={isPlayable ? () => onOpen(project) : undefined}
-          style={{ transform: "translateZ(30px)" }}
-        >
-          <div className="pa-work-thumb-inner" style={thumb ? { backgroundImage: `url(${thumb})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined} />
-          <div className="pa-work-glass" />
-          <span className="pa-work-idx">{String(index + 1).padStart(2, "0")}</span>
-          <div className="pa-work-play"><Play size={14} fill="#f5f6f8" color="#f5f6f8" /></div>
-          {duration && <span className="pa-work-dur">{duration}</span>}
-        </div>
-        <div className="pa-work-meta" style={{ transform: "translateZ(15px)" }}>
-          <div className="pa-work-cat">{project.cat}{project.software ? ` · ${project.software}` : ""}</div>
-          <div className="pa-work-title">{project.title}</div>
-        </div>
-      </Reveal>
-    </div>
+        <div className="pa-work-thumb-inner" style={thumb ? { backgroundImage: `url(${thumb})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined} />
+        <div className="pa-work-glass" />
+        <span className="pa-work-idx">{String(index + 1).padStart(2, "0")}</span>
+        <div className="pa-work-play"><Play size={14} fill="#f5f6f8" color="#f5f6f8" /></div>
+        {duration && <span className="pa-work-dur">{duration}</span>}
+      </div>
+      <div className="pa-work-meta">
+        <div className="pa-work-cat">{project.cat}{project.software ? ` · ${project.software}` : ""}</div>
+        <div className="pa-work-title">{project.title}</div>
+      </div>
+    </Reveal>
   );
 }
 
@@ -1259,6 +1016,7 @@ export default function Portfolio() {
           animation: btnSheenIdle 7s ease-in-out infinite;
         }
         .pa-soft-card:hover {
+          transform: translateY(-8px);
           border-color: rgba(120,160,230,0.45);
           box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 28px 50px -18px rgba(0,0,0,0.7), 0 0 22px rgba(59,130,246,0.12);
           animation-play-state: paused;
@@ -1354,6 +1112,7 @@ export default function Portfolio() {
           100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 24px 50px -24px rgba(0,0,0,0.65); }
         }
         .pa-work-card:hover {
+          transform: translateY(-7px);
           border-color: rgba(248,250,252,0.38);
           box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 30px 60px -20px rgba(0,0,0,0.7), 0 0 42px rgba(199,208,221,0.14);
         }
@@ -1652,7 +1411,6 @@ export default function Portfolio() {
         }}
       >
         <div className="pa-glow" />
-        <ThreeDParticleSphere />
         <svg className="pa-svg-layer" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid slice">
           <defs>
             <linearGradient id="silverStroke" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1771,7 +1529,10 @@ export default function Portfolio() {
           <div className="pa-software-strip">
             {SOFTWARE.map((s, i) => (
               <Reveal key={s.name} delay={i * 90}>
-                <SoftwareCard software={s} index={i} />
+                <div className="pa-soft-card" style={{ animationDelay: `${i * 0.35}s` }}>
+                  <div className="pa-soft-tile" style={{ background: s.bg, color: s.accent }}>{s.label}</div>
+                  <span className="pa-soft-name">{s.name}</span>
+                </div>
               </Reveal>
             ))}
           </div>
