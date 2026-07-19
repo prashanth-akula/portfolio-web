@@ -383,7 +383,15 @@ function VideoModal({ project, onClose }) {
           <CloseIcon size={18} />
         </button>
         <div className="pa-modal-video-wrap">
-          <video src={project.video} controls autoPlay playsInline />
+          <video
+            src={project.video}
+            controls
+            autoPlay
+            playsInline
+            controlsList="nodownload"
+            disablePictureInPicture
+            onContextMenu={(e) => e.preventDefault()}
+          />
         </div>
         <div className="pa-modal-meta">
           <div className="pa-modal-title pa-metallic-static">{project.title}</div>
