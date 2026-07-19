@@ -155,6 +155,7 @@ const PROJECT_1_THUMB = "data:image/jpeg;base64,/9j//gAQTGF2YzYwLjMxLjEwMgD/2wBD
 // Hosted on Cloudinary — plays directly, no local file needed alongside the code.
 const PROJECT_1_VIDEO = "https://res.cloudinary.com/v79ksbsw/video/upload/v1783874124/ArtFolio_video_1_yqqs9g.mp4";
 const PROJECT_2_VIDEO = "https://res.cloudinary.com/v79ksbsw/video/upload/v1784473384/VFX_x2ul4f.mp4";
+const PROJECT_2_THUMB = "https://res.cloudinary.com/v79ksbsw/video/upload/v1784473384/VFX_x2ul4f.jpg";
 
 const WORK_CATEGORIES = ["Motion Graphics", "Video Editing", "Graphic Design", "2D & 3D VFX"];
 
@@ -207,6 +208,7 @@ const PROJECTS = [
     cat: "2D VFX",
     software: "Adobe After Effects",
     video: PROJECT_2_VIDEO,
+    thumb: PROJECT_2_THUMB,
     dur: "01:22",
   },
   { title: "Fire & Smoke Simulation", category: "2D & 3D VFX", cat: "VFX", dur: "00:35" },
