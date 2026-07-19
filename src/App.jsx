@@ -154,6 +154,7 @@ const PROJECT_1_THUMB = "data:image/jpeg;base64,/9j//gAQTGF2YzYwLjMxLjEwMgD/2wBD
 
 // Hosted on Cloudinary — plays directly, no local file needed alongside the code.
 const PROJECT_1_VIDEO = "https://res.cloudinary.com/v79ksbsw/video/upload/v1783874124/ArtFolio_video_1_yqqs9g.mp4";
+const PROJECT_2_VIDEO = "https://res.cloudinary.com/v79ksbsw/video/upload/v1784473384/VFX_x2ul4f.mp4";
 
 const WORK_CATEGORIES = ["Motion Graphics", "Video Editing", "Graphic Design", "2D & 3D VFX"];
 
@@ -200,7 +201,14 @@ const PROJECTS = [
   { title: "Business Card & Stationery", category: "Graphic Design", cat: "Print Design", dur: "00:14" },
 
   // ---- 2D & 3D VFX (9) ----
-  { title: "Chhota Bheem FX", category: "2D & 3D VFX", cat: "2D VFX", dur: "01:22" },
+  {
+    title: "Chhota Bheem FX",
+    category: "2D & 3D VFX",
+    cat: "2D VFX",
+    software: "Adobe After Effects",
+    video: PROJECT_2_VIDEO,
+    dur: "01:22",
+  },
   { title: "Fire & Smoke Simulation", category: "2D & 3D VFX", cat: "VFX", dur: "00:35" },
   { title: "Magic Particle Effects", category: "2D & 3D VFX", cat: "Particle VFX", dur: "00:42" },
   { title: "Character Rig Animation", category: "2D & 3D VFX", cat: "3D Animation", dur: "01:05" },
