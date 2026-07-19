@@ -40,3 +40,20 @@ textarea,
 select {
   font: inherit;
 }
+
+/* Prevent selection and dragging globally to protect content */
+body, video, img, iframe, canvas {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+/* Security blur when browser window loses focus to deter screen recording/screenshots */
+.pa-security-blur {
+  filter: blur(40px) !important;
+  pointer-events: none !important;
+  transition: filter 0.25s ease;
+}

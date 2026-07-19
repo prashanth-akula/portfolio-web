@@ -413,6 +413,69 @@ export default function Portfolio() {
   const [workFading, setWorkFading] = useState(false);
   const workFadeTimeout = useRef(null);
 
+  const [isFocused, setIsFocused] = useState(true);
+
+  // Security and focus/blur handling to prevent recording/inspection
+  useEffect(() => {
+    const handleFocus = () => setIsFocused(true);
+    const handleBlur = () => setIsFocused(false);
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsFocused(false);
+      } else {
+        setIsFocused(true);
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("blur", handleBlur);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    const handleContextMenu = (e) => e.preventDefault();
+
+    const handleKeyDown = (e) => {
+      // F12 key
+      if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+      }
+      // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+      if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+        e.preventDefault();
+        return false;
+      }
+      // Ctrl+U (View Source)
+      if (e.ctrlKey && e.keyCode === 85) {
+        e.preventDefault();
+        return false;
+      }
+      // Ctrl+S (Save Page)
+      if (e.ctrlKey && e.keyCode === 83) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    document.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("keydown", handleKeyDown);
+
+    const handleDragStart = (e) => {
+      if (e.target.tagName === "IMG" || e.target.tagName === "VIDEO") {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener("dragstart", handleDragStart);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("blur", handleBlur);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("dragstart", handleDragStart);
+    };
+  }, []);
+
   const selectWorkCategory = (cat) => {
     if (cat === activeWorkCat) return;
     setActiveWorkCat(cat);
@@ -575,7 +638,7 @@ export default function Portfolio() {
   };
 
   return (
-    <div className="pa-root" id="top">
+    <div className={`pa-root ${isFocused ? "" : "pa-security-blur"}`} id="top">
       <style>{`
         html { scroll-behavior: smooth; }
         @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
@@ -1758,6 +1821,34 @@ export default function Portfolio() {
 
       {modalProject && (
         <VideoModal project={modalProject} onClose={() => setModalProject(null)} />
+      )}
+
+      {!isFocused && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "rgba(5, 5, 5, 0.85)",
+          backdropFilter: "blur(20px)",
+          color: "#ffffff",
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontSize: "20px",
+          fontWeight: "bold",
+          letterSpacing: "1px",
+          zIndex: 999999,
+          pointerEvents: "all",
+        }}>
+          <span style={{ fontSize: "36px" }}>🔒</span>
+          <span>SCREEN PROTECTED FOR SECURITY</span>
+          <span style={{ fontSize: "12px", opacity: 0.6, fontWeight: "normal" }}>Click back to resume view</span>
+        </div>
       )}
     </div>
   );
