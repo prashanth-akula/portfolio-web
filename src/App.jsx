@@ -156,7 +156,8 @@ const PROJECT_1_THUMB = "data:image/jpeg;base64,/9j//gAQTGF2YzYwLjMxLjEwMgD/2wBD
 const PROJECT_1_VIDEO = "https://res.cloudinary.com/v79ksbsw/video/upload/v1783874124/ArtFolio_video_1_yqqs9g.mp4";
 const PROJECT_2_VIDEO = "https://res.cloudinary.com/v79ksbsw/video/upload/v1784473384/VFX_x2ul4f.mp4";
 const PROJECT_2_THUMB = "https://res.cloudinary.com/v79ksbsw/video/upload/v1784473384/VFX_x2ul4f.jpg";
-const PROJECT_3_VIDEO = "https://drive.usercontent.google.com/download?id=1II1oCnabl5dgUZHoMMzFAIBrXVTM1R4G&export=download&confirm=t";
+const PROJECT_3_VIDEO = "https://drive.google.com/file/d/1II1oCnabl5dgUZHoMMzFAIBrXVTM1R4G/preview";
+const PROJECT_3_THUMB = "https://drive.google.com/thumbnail?id=1II1oCnabl5dgUZHoMMzFAIBrXVTM1R4G&sz=w600";
 
 
 const WORK_CATEGORIES = ["Motion Graphics", "Video Editing", "Graphic Design", "2D & 3D VFX"];
@@ -218,6 +219,7 @@ const PROJECTS = [
     category: "2D & 3D VFX",
     cat: "VFX",
     video: PROJECT_3_VIDEO,
+    thumb: PROJECT_3_THUMB,
     dur: "00:35",
   },
   { title: "Magic Particle Effects", category: "2D & 3D VFX", cat: "Particle VFX", dur: "00:42" },
@@ -401,15 +403,27 @@ function VideoModal({ project, onClose }) {
           <CloseIcon size={18} />
         </button>
         <div className="pa-modal-video-wrap">
-          <video
-            src={project.video}
-            controls
-            autoPlay
-            playsInline
-            controlsList="nodownload"
-            disablePictureInPicture
-            onContextMenu={(e) => e.preventDefault()}
-          />
+          {project.video && project.video.includes("drive.google.com") ? (
+            <iframe
+              src={project.video}
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+              style={{ aspectRatio: "16/9", border: "none", width: "100%", height: "100%" }}
+            />
+          ) : (
+            <video
+              src={project.video}
+              controls
+              autoPlay
+              playsInline
+              controlsList="nodownload"
+              disablePictureInPicture
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          )}
         </div>
         <div className="pa-modal-meta">
           <div className="pa-modal-title pa-metallic-static">{project.title}</div>
